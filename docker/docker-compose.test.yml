@@ -1,0 +1,94 @@
+version: '3'
+services:
+
+  # genesis node
+  tm-ndid:
+    image: ndidplatform/did-tendermint:${DOCKER_TAG:-latest}
+    environment:
+      - TM_RPC_PORT=${TM_RPC_PORT:-45000}
+      - DEV_ENV=${DEV_ENV:-true}
+    entrypoint: /usr/bin/start-node.sh
+    command: 
+      - genesis
+      - --p2p.laddr=tcp://0.0.0.0:${TM_P2P_PORT:-47000}
+      - --rpc.laddr=tcp://0.0.0.0:${TM_RPC_PORT:-45000}
+    volumes:
+      - ./start-node.sh:/usr/bin/start-node.sh:ro
+    security_opt:
+      - no-new-privileges
+    ports:
+      - 45000:${TM_RPC_PORT:-45000}
+      - 47000:${TM_P2P_PORT:-47000}
+    networks:
+      - ndidplatform
+
+  # secondary nodes
+  tm-idp:
+    image: ndidplatform/did-tendermint:${DOCKER_TAG:-latest}
+    environment:
+      - SEED_HOSTNAME=tm-ndid
+      - TM_RPC_PORT=${TM_RPC_PORT:-45000}
+      - DEV_ENV=${DEV_ENV:-true}
+    entrypoint: /usr/bin/start-node.sh
+    command: 
+      - secondary
+      - --p2p.laddr=tcp://0.0.0.0:${TM_P2P_PORT:-47000}
+      - --rpc.laddr=tcp://0.0.0.0:${TM_RPC_PORT:-45000}
+    volumes:
+      - ./start-node.sh:/usr/bin/start-node.sh:ro
+    security_opt:
+      - no-new-privileges
+    ports:
+      - 45001:${TM_RPC_PORT:-45000}
+      - 47001:${TM_P2P_PORT:-47000}
+    networks:
+      - ndidplatform
+    depends_on:
+      - tm-ndid
+  tm-rp:
+    image: ndidplatform/did-tendermint:${DOCKER_TAG:-latest}
+    environment:
+      - SEED_HOSTNAME=tm-ndid
+      - TM_RPC_PORT=${TM_RPC_PORT:-45000}
+      - DEV_ENV=${DEV_ENV:-true}
+    entrypoint: /usr/bin/start-node.sh
+    command: 
+      - secondary
+      - --p2p.laddr=tcp://0.0.0.0:${TM_P2P_PORT:-47000}
+      - --rpc.laddr=tcp://0.0.0.0:${TM_RPC_PORT:-45000}
+    volumes:
+      - ./start-node.sh:/usr/bin/start-node.sh:ro
+    security_opt:
+      - no-new-privileges
+    ports:
+      - 45002:${TM_RPC_PORT:-45000}
+      - 47002:${TM_P2P_PORT:-47000}
+    networks:
+      - ndidplatform
+    depends_on:
+      - tm-ndid
+  tm-as:
+    image: ndidplatform/did-tendermint:${DOCKER_TAG:-latest}
+    environment:
+      - SEED_HOSTNAME=tm-ndid
+      - TM_RPC_PORT=${TM_RPC_PORT:-45000}
+      - DEV_ENV=${DEV_ENV:-true}
+    entrypoint: /usr/bin/start-node.sh
+    command: 
+      - secondary
+      - --p2p.laddr=tcp://0.0.0.0:${TM_P2P_PORT:-47000}
+      - --rpc.laddr=tcp://0.0.0.0:${TM_RPC_PORT:-45000}
+    volumes:
+      - ./start-node.sh:/usr/bin/start-node.sh:ro
+    security_opt:
+      - no-new-privileges
+    ports:
+      - 45003:${TM_RPC_PORT:-45000}
+      - 47003:${TM_P2P_PORT:-47000}
+    networks:
+      - ndidplatform
+    depends_on:
+      - tm-ndid
+
+networks:
+  ndidplatform:

@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message NodeDetail {
+  string public_key = 1;
+  string master_public_key = 2;
+  string node_name = 3;
+  bool active = 4;
+}

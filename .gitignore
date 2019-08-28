@@ -1,0 +1,27 @@
+*.log
+
+# misc
+.DS_Store
+
+*.swp
+
+build/
+
+# localDB
+localDB/
+IdP_DB/
+RP_DB/
+AS_DB/
+
+# dependencies
+vendor/
+
+# tendermint data
+config/tendermint/IdP/data/
+config/tendermint/RP/data/
+config/tendermint/AS/data/
+config/tendermint/AS2/data/
+config/tendermint/IdP/config/write-file-atomic*
+config/tendermint/RP/config/write-file-atomic*
+config/tendermint/AS/config/write-file-atomic*
+config/tendermint/AS2/config/write-file-atomic*
