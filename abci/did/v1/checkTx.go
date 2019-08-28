@@ -34,9 +34,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/blockfint/benchmark-tm/abci/code"
 	"github.com/blockfint/benchmark-tm/protos/data"
+	"github.com/golang/protobuf/proto"
 	"github.com/tendermint/tendermint/abci/types"
 )
 
@@ -193,7 +193,7 @@ func checkAccessorPubKey(param string) (returnCode uint32, log string) {
 }
 
 // CheckTxRouter is Pointer to function
-func (app *DIDApplication) CheckTxRouter(method string, param string, nonce []byte, signature []byte, nodeID string) types.ResponseCheckTx {
+func (app *DIDApplication) CheckTxRouter(method string, param string, nonce []byte, nodeID string) types.ResponseCheckTx {
 
 	var publicKey string
 	if method == "RegisterMasterNode" {
@@ -216,10 +216,10 @@ func (app *DIDApplication) CheckTxRouter(method string, param string, nonce []by
 		}
 	}
 
-	verifyResult, err := verifySignature(param, nonce, signature, publicKey, method)
-	if err != nil || verifyResult == false {
-		return ReturnCheckTx(code.VerifySignatureError, err.Error())
-	}
+	// verifyResult, err := verifySignature(param, nonce, signature, publicKey, method)
+	// if err != nil || verifyResult == false {
+	// 	return ReturnCheckTx(code.VerifySignatureError, err.Error())
+	// }
 
 	var result types.ResponseCheckTx
 	result = app.callCheckTx(method, param, nodeID)

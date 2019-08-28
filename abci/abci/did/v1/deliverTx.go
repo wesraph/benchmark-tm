@@ -76,9 +76,9 @@ func (app *DIDApplication) ReturnDeliverTxLogWitgTag(code uint32, log string, sp
 }
 
 // DeliverTxRouter is Pointer to function
-func (app *DIDApplication) DeliverTxRouter(method string, param string, nonce []byte, signature []byte, nodeID string) types.ResponseDeliverTx {
+func (app *DIDApplication) DeliverTxRouter(method string, param string, nonce []byte, nodeID string) types.ResponseDeliverTx {
 	// ---- check authorization ----
-	checkTxResult := app.CheckTxRouter(method, param, nonce, signature, nodeID)
+	checkTxResult := app.CheckTxRouter(method, param, nonce, nodeID)
 	if checkTxResult.Code != code.OK {
 		if checkTxResult.Log != "" {
 			return app.ReturnDeliverTxLog(checkTxResult.Code, checkTxResult.Log, "")

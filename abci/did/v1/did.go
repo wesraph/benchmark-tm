@@ -32,9 +32,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/blockfint/benchmark-tm/abci/code"
 	"github.com/blockfint/benchmark-tm/abci/version"
+	"github.com/golang/protobuf/proto"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/abci/types"
 
@@ -183,7 +183,7 @@ func (app *DIDApplication) DeliverTx(tx []byte) (res types.ResponseDeliverTx) {
 	method := txObj.Method
 	param := txObj.Params
 	nonce := txObj.Nonce
-	signature := txObj.Signature
+	// signature := txObj.Signature
 	nodeID := txObj.NodeId
 
 	go recordDeliverTxMetrics(method)
@@ -200,7 +200,7 @@ func (app *DIDApplication) DeliverTx(tx []byte) (res types.ResponseDeliverTx) {
 	app.logger.Infof("DeliverTx: %s, NodeID: %s", method, nodeID)
 
 	if method != "" {
-		result := app.DeliverTxRouter(method, param, nonce, signature, nodeID)
+		result := app.DeliverTxRouter(method, param, nonce, nodeID)
 		app.logger.Infof(`DeliverTx response: {"code":%d,"log":"%s","tags":[{"key":"%s","value":"%s"}]}`, result.Code, result.Log, string(result.Tags[0].Key), string(result.Tags[0].Value))
 		go recordDeliverTxDurationMetrics(startTime, method)
 		if result.Code != code.OK {
@@ -231,7 +231,7 @@ func (app *DIDApplication) CheckTx(tx []byte) (res types.ResponseCheckTx) {
 	method := txObj.Method
 	param := txObj.Params
 	nonce := txObj.Nonce
-	signature := txObj.Signature
+	// signature := txObj.Signature
 	nodeID := txObj.NodeId
 
 	go recordCheckTxMetrics(method)
@@ -271,10 +271,10 @@ func (app *DIDApplication) CheckTx(tx []byte) (res types.ResponseCheckTx) {
 
 	app.logger.Infof("CheckTx: %s, NodeID: %s", method, nodeID)
 
-	if method != "" && param != "" && nonce != nil && signature != nil && nodeID != "" {
+	if method != "" && param != "" && nonce != nil && nodeID != "" {
 		// Check has function in system
 		if IsMethod[method] {
-			result := app.CheckTxRouter(method, param, nonce, signature, nodeID)
+			result := app.CheckTxRouter(method, param, nonce, nodeID)
 			go recordCheckTxDurationMetrics(startTime, method)
 			if result.Code != code.OK {
 				go recordCheckTxFailMetrics(method)
