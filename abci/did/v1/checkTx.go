@@ -35,8 +35,8 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/ndidplatform/smart-contract/abci/code"
-	"github.com/ndidplatform/smart-contract/protos/data"
+	"github.com/blockfint/benchmark-tm/abci/code"
+	"github.com/blockfint/benchmark-tm/protos/data"
 	"github.com/tendermint/tendermint/abci/types"
 )
 

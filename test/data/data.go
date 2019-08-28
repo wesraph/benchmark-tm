@@ -23,7 +23,7 @@
 package data
 
 import (
-	"github.com/ndidplatform/smart-contract/test/utils"
+	"github.com/blockfint/benchmark-tm/test/utils"
 	uuid "github.com/satori/go.uuid"
 )
 

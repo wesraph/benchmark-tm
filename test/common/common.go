@@ -27,8 +27,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ndidplatform/smart-contract/abci/did/v1"
-	"github.com/ndidplatform/smart-contract/test/utils"
+	"github.com/blockfint/benchmark-tm/abci/did/v1"
+	"github.com/blockfint/benchmark-tm/test/utils"
 )
 
 func RegisterMasterNode(t *testing.T, nodeID, privK string, param did.RegisterMasterNodeParam) {

@@ -29,7 +29,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ndidplatform/smart-contract/abci/code"
+	"github.com/blockfint/benchmark-tm/abci/code"
 	"github.com/tendermint/tendermint/abci/types"
 )
 

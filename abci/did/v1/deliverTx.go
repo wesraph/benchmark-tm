@@ -26,7 +26,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/ndidplatform/smart-contract/abci/code"
+	"github.com/blockfint/benchmark-tm/abci/code"
 	"github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 )
