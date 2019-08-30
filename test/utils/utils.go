@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto"
+	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -11,6 +12,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"log"
+	"math/big"
 	mathRand "math/rand"
 	"net/http"
 	"net/url"
@@ -18,21 +20,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	protoTm "github.com/blockfint/benchmark-tm/protos/tendermint"
+	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/libs/common"
 )
 
 var tendermintAddr = GetEnv("TENDERMINT_ADDRESS", "http://localhost:45000")
 
-func GetPrivateKeyFromString(privK string) *rsa.PrivateKey {
+func GetPrivateKeyFromStringEcdsa(privK string) (*ecdsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(privK))
+	x509Encoded := block.Bytes
+	return x509.ParseECPrivateKey(x509Encoded)
+}
+
+func GetPrivateKeyFromString(privK string) (*rsa.PrivateKey, error) {
 	privK = strings.Replace(privK, "\t", "", -1)
 	block, _ := pem.Decode([]byte(privK))
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	return privateKey
+	return x509.ParsePKCS1PrivateKey(block.Bytes)
 }
 
 func GeneratePublicKey(publicKey *rsa.PublicKey) ([]byte, error) {
@@ -62,6 +66,44 @@ func CreateSignatureAndNonce(fnName string, paramJSON []byte, privKey *rsa.Priva
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	return nonce, signature
+}
+
+func CreateSignatureAndNonceEcdsa(fnName string, paramJSON []byte, privKey *ecdsa.PrivateKey) (nonce string, signature []byte) {
+	nonce = base64.StdEncoding.EncodeToString([]byte(common.RandStr(12)))
+
+	// Generating message
+	tempPSSmessage := append([]byte(fnName), paramJSON...)
+	tempPSSmessage = append(tempPSSmessage, []byte(nonce)...)
+	PSSmessage := []byte(base64.StdEncoding.EncodeToString(tempPSSmessage))
+
+	// Hash the message
+	newhash := crypto.SHA256
+	pssh := newhash.New()
+	pssh.Write(PSSmessage)
+	signhash := pssh.Sum(nil)
+
+	r := big.NewInt(0)
+	s := big.NewInt(0)
+	r, s, serr := ecdsa.Sign(rand.Reader, privKey, signhash)
+	if serr != nil {
+		panic(serr)
+	}
+
+	type SignValues struct {
+		R BigInt
+		S BigInt
+	}
+
+	var encBigInt SignValues
+	encBigInt.R.Int = *r
+	encBigInt.S.Int = *s
+
+	signature, err := json.Marshal(encBigInt)
+	if err != nil {
+		panic(err)
+	}
+
 	return nonce, signature
 }
 
@@ -196,4 +238,48 @@ type ResponseQuery struct {
 			Height string `json:"height"`
 		} `json:"response"`
 	} `json:"result"`
+}
+
+func EncodeEcdsa(privateKey *ecdsa.PrivateKey, publicKey *ecdsa.PublicKey) (string, string) {
+	x509Encoded, _ := x509.MarshalECPrivateKey(privateKey)
+	pemEncoded := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: x509Encoded})
+
+	x509EncodedPub, _ := x509.MarshalPKIXPublicKey(publicKey)
+	pemEncodedPub := pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: x509EncodedPub})
+
+	return string(pemEncoded), string(pemEncodedPub)
+}
+
+func DecodeEcdsa(pemEncoded string, pemEncodedPub string) (*ecdsa.PrivateKey, *ecdsa.PublicKey) {
+	block, _ := pem.Decode([]byte(pemEncoded))
+	x509Encoded := block.Bytes
+	privateKey, _ := x509.ParseECPrivateKey(x509Encoded)
+
+	blockPub, _ := pem.Decode([]byte(pemEncodedPub))
+	x509EncodedPub := blockPub.Bytes
+	genericPublicKey, _ := x509.ParsePKIXPublicKey(x509EncodedPub)
+	publicKey := genericPublicKey.(*ecdsa.PublicKey)
+
+	return privateKey, publicKey
+}
+
+type BigInt struct {
+	big.Int
+}
+
+func (b BigInt) MarshalJSON() ([]byte, error) {
+	return []byte(b.String()), nil
+}
+
+func (b *BigInt) UnmarshalJSON(p []byte) error {
+	if string(p) == "null" {
+		return nil
+	}
+	var z big.Int
+	_, ok := z.SetString(string(p), 10)
+	if !ok {
+		return fmt.Errorf("not a valid big integer: %s", p)
+	}
+	b.Int = z
+	return nil
 }

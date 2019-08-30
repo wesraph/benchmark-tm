@@ -71,7 +71,7 @@ var ReferenceGroupCode1 = uuid.NewV4()
 var ServiceID1 = utils.RandStringRunes(20)
 var ServiceID2 = utils.RandStringRunes(20)
 
-var MasterNodePrivK = `-----BEGIN RSA PRIVATE KEY-----
+var MasterNodePrivRSA = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA30i6deo6vqxPdoxA9pUpuBag/cVwEVWO8dds5QDfu/z957zx
 XUCYRxaiRWGAbOta4K5/7cxlsqI8fCvoSyAa/B7GTSc3vivK/GWUFP+sQ/Mj6C/f
 gw5pxK/+olBzfzLMDEOwFRbnYtPtbWozfvceq77fEReTUdBGRLak7twxLrRPNzIu
@@ -98,6 +98,12 @@ M18jPQKBgQC5M1E9aUYdVRC2j6HyamAm73uLOdltQ7S0pKtypjMYBEUVzbXet2TS
 iEkC3ntWGFU9RAOKvwFWvOz3Vuxqgl+H5nkoYH6qhkgAuqOGAHb/DD4VHWzxwHnD
 W3SgZHxUij7PPJ8Vslvoov9SZIq5vBZiWvfNKOb4/8KD1IK9dO1aKw==
 -----END RSA PRIVATE KEY-----`
+
+var MasterNodePrivEcdsa = `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIM1MsG+Kq4jYneeg7kPK9wc9RFzMNG6FZcYWu3EavMdRoAoGCCqGSM49
+AwEHoUQDQgAEBLmVB+aWv/7brTPJh/syCs71b4YPSkFmPXYlDQZMMYdVoCw5nlOr
+I2iCCQqQQJJjOidk/ppB7pA5sB2ZOTTsAA==
+-----END EC PRIVATE KEY-----`
 
 var rpPrivK = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAwCB4UBzQcnd6GAzPgbt9j2idW23qKZrsvldPNifmOPLfLlMu

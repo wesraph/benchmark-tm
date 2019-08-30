@@ -32,11 +32,12 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"math/big"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/blockfint/benchmark-tm/abci/code"
 	"github.com/blockfint/benchmark-tm/protos/data"
+	"github.com/golang/protobuf/proto"
 	"github.com/tendermint/tendermint/abci/types"
 )
 
@@ -44,6 +45,27 @@ var IsMethod = map[string]bool{
 	"RegisterMasterNode": true,
 	"SetTx":              true,
 	"SetValidator":       true,
+}
+
+type BigInt struct {
+	big.Int
+}
+
+func (b BigInt) MarshalJSON() ([]byte, error) {
+	return []byte(b.String()), nil
+}
+
+func (b *BigInt) UnmarshalJSON(p []byte) error {
+	if string(p) == "null" {
+		return nil
+	}
+	var z big.Int
+	_, ok := z.SetString(string(p), 10)
+	if !ok {
+		return fmt.Errorf("not a valid big integer: %s", p)
+	}
+	b.Int = z
+	return nil
 }
 
 func (app *DIDApplication) checkCanRegisterMasterNode(param string, nodeID string) types.ResponseCheckTx {
@@ -61,25 +83,50 @@ func (app *DIDApplication) checkCanSetTx(param string, nodeID string) types.Resp
 }
 
 func verifySignature(param string, nonce []byte, signature []byte, publicKey string, method string) (result bool, err error) {
+	// Get the certificate
 	publicKey = strings.Replace(publicKey, "\t", "", -1)
 	block, _ := pem.Decode([]byte(publicKey))
+
+	// Get the key
 	senderPublicKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
-	senderPublicKey := senderPublicKeyInterface.(*rsa.PublicKey)
+	//senderPublicKey := senderPublicKeyInterface.(*ecdsa.PublicKey)
 	if err != nil {
 		return false, err
 	}
+
+	// Build the message and encode to base64
 	tempPSSmessage := append([]byte(method), []byte(param)...)
 	tempPSSmessage = append(tempPSSmessage, []byte(nonce)...)
 	PSSmessage := []byte(base64.StdEncoding.EncodeToString(tempPSSmessage))
+
+	// Hash the message
+	fmt.Println("Hashing")
 	newhash := crypto.SHA256
 	pssh := newhash.New()
 	pssh.Write(PSSmessage)
 	hashed := pssh.Sum(nil)
-	err = rsa.VerifyPKCS1v15(senderPublicKey, newhash, hashed, signature)
-	if err != nil {
-		return false, err
+
+	switch pubKey := senderPublicKeyInterface.(type) {
+	case *ecdsa.PublicKey:
+		// Get R and S
+		type SignValues struct {
+			R BigInt
+			S BigInt
+		}
+		var signVal SignValues
+		err = json.Unmarshal(signature, &signVal)
+		if err != nil {
+			return false, nil
+		}
+		r, s := big.Int(signVal.R.Int), big.Int(signVal.S.Int)
+
+		return ecdsa.Verify(pubKey, hashed, &r, &s), nil
+	case *rsa.PublicKey:
+		err = rsa.VerifyPKCS1v15(pubKey, newhash, hashed, signature)
+		return err == nil, err
 	}
-	return true, nil
+
+	return false, fmt.Errorf("Unsupported keytype")
 }
 
 // ReturnCheckTx return types.ResponseDeliverTx
@@ -128,21 +175,27 @@ func (app *DIDApplication) getPublicKeyFromNodeID(nodeID string) string {
 }
 
 func checkPubKey(key string) (returnCode uint32, log string) {
+	fmt.Println("Decoding key:", key)
 	block, _ := pem.Decode([]byte(key))
 	if block == nil {
 		return code.InvalidKeyFormat, "Invalid key format. Cannot decode PEM."
 	}
+
+	fmt.Println("Parsing publicKey:", string(block.Bytes))
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return code.InvalidKeyFormat, err.Error()
 	}
 
+	fmt.Println("Checking type")
 	switch pubKey := pub.(type) {
 	case *rsa.PublicKey:
 		if pubKey.N.BitLen() < 2048 {
 			return code.RSAKeyLengthTooShort, "RSA key length is too short. Must be at least 2048-bit."
 		}
-	case *dsa.PublicKey, *ecdsa.PublicKey:
+	case *ecdsa.PublicKey:
+		return code.OK, ""
+	case *dsa.PublicKey:
 		return code.UnsupportedKeyType, "Unsupported key type. Only RSA is allowed."
 	default:
 		return code.UnknownKeyType, "Unknown key type. Only RSA is allowed."
@@ -159,6 +212,7 @@ func checkNodePubKeys(param string) (returnCode uint32, log string) {
 	if err != nil {
 		return code.UnmarshalError, err.Error()
 	}
+
 	// Validate master public key format
 	if keys.MasterPublicKey != "" {
 		returnCode, log = checkPubKey(keys.MasterPublicKey)

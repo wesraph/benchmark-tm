@@ -23,25 +23,61 @@
 package common
 
 import (
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"encoding/json"
 	"fmt"
 	"testing"
 
 	"github.com/blockfint/benchmark-tm/abci/did/v1"
 	"github.com/blockfint/benchmark-tm/test/utils"
+	"github.com/kr/pretty"
 )
 
-func RegisterMasterNode(t *testing.T, nodeID, privK string, param did.RegisterMasterNodeParam) {
-	privKey := utils.GetPrivateKeyFromString(privK)
+const (
+	_ = iota
+	EcdsaPrivateKey
+	RSAPrivateKey
+)
+
+func RegisterMasterNode(t *testing.T, nodeID, privK string, param did.RegisterMasterNodeParam, keyType int) {
+	var privKeyEcdsa *ecdsa.PrivateKey
+	var privKeyRSA *rsa.PrivateKey
+	var err error
+
+	if keyType == EcdsaPrivateKey {
+		privKeyEcdsa, err = utils.GetPrivateKeyFromStringEcdsa(privK)
+	} else if keyType == RSAPrivateKey {
+		privKeyRSA, err = utils.GetPrivateKeyFromString(privK)
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
 	paramJSON, err := json.Marshal(param)
 	if err != nil {
 		fmt.Println("error:", err)
 	}
+
 	fnName := "RegisterMasterNode"
-	nonce, signature := utils.CreateSignatureAndNonce(fnName, paramJSON, privKey)
-	result, _ := utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
+	var nonce string
+	var signature []byte
+
+	if keyType == EcdsaPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonceEcdsa(fnName, paramJSON, privKeyEcdsa)
+	} else if keyType == RSAPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
+	}
+
+	result, err := utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
+	if err != nil {
+		panic(err)
+	}
+
 	resultObj, _ := result.(utils.ResponseTx)
 	expected := "success"
+	pretty.Println(resultObj)
 	if actual := resultObj.Result.DeliverTx.Log; actual != expected {
 		t.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
 		t.Fatalf("FAIL: %s\nExpected: %#v\nActual: %#v", fnName, expected, actual)
@@ -49,14 +85,35 @@ func RegisterMasterNode(t *testing.T, nodeID, privK string, param did.RegisterMa
 	t.Logf("PASS: %s", fnName)
 }
 
-func SetTx(t *testing.T, nodeID, privK string, param did.SetTxParam) {
-	privKey := utils.GetPrivateKeyFromString(privK)
+func SetTx(t *testing.T, nodeID, privK string, param did.SetTxParam, keyType int) {
+	var privKeyEcdsa *ecdsa.PrivateKey
+	var privKeyRSA *rsa.PrivateKey
+	var err error
+
+	if keyType == EcdsaPrivateKey {
+		privKeyEcdsa, err = utils.GetPrivateKeyFromStringEcdsa(privK)
+	} else if keyType == RSAPrivateKey {
+		privKeyRSA, err = utils.GetPrivateKeyFromString(privK)
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
 	paramJSON, err := json.Marshal(param)
 	if err != nil {
 		fmt.Println("error:", err)
 	}
 	fnName := "SetTx"
-	nonce, signature := utils.CreateSignatureAndNonce(fnName, paramJSON, privKey)
+
+	var nonce string
+	var signature []byte
+	if keyType == EcdsaPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonceEcdsa(fnName, paramJSON, privKeyEcdsa)
+	} else if keyType == RSAPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
+	}
+
 	result, _ := utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
 	resultObj, _ := result.(utils.ResponseTx)
 	expected := "success"
@@ -67,14 +124,35 @@ func SetTx(t *testing.T, nodeID, privK string, param did.SetTxParam) {
 	t.Logf("PASS: %s", fnName)
 }
 
-func SetValidator(t *testing.T, nodeID, privK string, param did.SetValidatorParam) {
-	privKey := utils.GetPrivateKeyFromString(privK)
+func SetValidator(t *testing.T, nodeID, privK string, param did.SetValidatorParam, keyType int) {
+	var privKeyEcdsa *ecdsa.PrivateKey
+	var privKeyRSA *rsa.PrivateKey
+	var err error
+
+	if keyType == EcdsaPrivateKey {
+		privKeyEcdsa, err = utils.GetPrivateKeyFromStringEcdsa(privK)
+	} else if keyType == RSAPrivateKey {
+		privKeyRSA, err = utils.GetPrivateKeyFromString(privK)
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
 	paramJSON, err := json.Marshal(param)
 	if err != nil {
 		fmt.Println("error:", err)
 	}
 	fnName := "SetValidator"
-	nonce, signature := utils.CreateSignatureAndNonce(fnName, paramJSON, privKey)
+
+	var nonce string
+	var signature []byte
+	if keyType == EcdsaPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonceEcdsa(fnName, paramJSON, privKeyEcdsa)
+	} else if keyType == RSAPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
+	}
+
 	result, _ := utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
 	resultObj, _ := result.(utils.ResponseTx)
 	expected := "success"
