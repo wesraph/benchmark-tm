@@ -35,10 +35,10 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/wesraph/benchmark-tm/abci/code"
-	"github.com/wesraph/benchmark-tm/protos/data"
 	"github.com/golang/protobuf/proto"
 	"github.com/tendermint/tendermint/abci/types"
+	"github.com/wesraph/benchmark-tm/abci/code"
+	"github.com/wesraph/benchmark-tm/protos/data"
 )
 
 var IsMethod = map[string]bool{
@@ -100,7 +100,6 @@ func verifySignature(param string, nonce []byte, signature []byte, publicKey str
 	PSSmessage := []byte(base64.StdEncoding.EncodeToString(tempPSSmessage))
 
 	// Hash the message
-	fmt.Println("Hashing")
 	newhash := crypto.SHA256
 	pssh := newhash.New()
 	pssh.Write(PSSmessage)
@@ -175,19 +174,16 @@ func (app *DIDApplication) getPublicKeyFromNodeID(nodeID string) string {
 }
 
 func checkPubKey(key string) (returnCode uint32, log string) {
-	fmt.Println("Decoding key:", key)
 	block, _ := pem.Decode([]byte(key))
 	if block == nil {
 		return code.InvalidKeyFormat, "Invalid key format. Cannot decode PEM."
 	}
 
-	fmt.Println("Parsing publicKey:", string(block.Bytes))
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return code.InvalidKeyFormat, err.Error()
 	}
 
-	fmt.Println("Checking type")
 	switch pubKey := pub.(type) {
 	case *rsa.PublicKey:
 		if pubKey.N.BitLen() < 2048 {
