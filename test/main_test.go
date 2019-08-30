@@ -5,7 +5,6 @@ import (
 	"encoding/pem"
 	"testing"
 
-	"github.com/kr/pretty"
 	"github.com/wesraph/benchmark-tm/abci/did/v1"
 	"github.com/wesraph/benchmark-tm/test/common"
 	"github.com/wesraph/benchmark-tm/test/data"
@@ -18,16 +17,11 @@ func TestRegisterMasterNodeEcdsa(t *testing.T) {
 		panic(err)
 	}
 
-	pretty.Println(privKey)
-
 	x509EncodedPub, err := x509.MarshalPKIXPublicKey(&privKey.PublicKey)
 	if err != nil {
 		panic(err)
 	}
-	pretty.Println(x509EncodedPub)
 	pemEncodedPub := pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: x509EncodedPub})
-
-	pretty.Println(string(pemEncodedPub))
 
 	var param did.RegisterMasterNodeParam
 	param.NodeID = data.MasterNodeID

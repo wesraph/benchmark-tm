@@ -30,7 +30,6 @@ import (
 
 	"github.com/wesraph/benchmark-tm/abci/did/v1"
 	"github.com/wesraph/benchmark-tm/test/utils"
-	"github.com/kr/pretty"
 )
 
 const (
@@ -51,12 +50,12 @@ func RegisterMasterNode(nodeID, privK string, param did.RegisterMasterNodeParam,
 	}
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	paramJSON, err := json.Marshal(param)
 	if err != nil {
-		fmt.Println("error:", err)
+		return err
 	}
 
 	fnName := "RegisterMasterNode"
@@ -69,17 +68,18 @@ func RegisterMasterNode(nodeID, privK string, param did.RegisterMasterNodeParam,
 		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
 	}
 
-	result, err := utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
+	_, err = utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
 	if err != nil {
 		panic(err)
 	}
 
-	resultObj, _ := result.(utils.ResponseTx)
-	expected := "success"
-	pretty.Println(resultObj)
-	if actual := resultObj.Result.DeliverTx.Log; actual != expected {
-		return fmt.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
-	}
+	//resultObj, _ := result.(utils.ResponseTx)
+	//expected := "success"
+	//pretty.Println(resultObj)
+	//if actual := resultObj.Result.DeliverTx.Log; actual != expected {
+	//fmt.Println(actual)
+	//return fmt.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
+	//}
 
 	return nil
 }
@@ -96,7 +96,7 @@ func SetTx(nodeID, privK string, param did.SetTxParam, keyType int) error {
 	}
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	paramJSON, err := json.Marshal(param)
@@ -113,13 +113,9 @@ func SetTx(nodeID, privK string, param did.SetTxParam, keyType int) error {
 		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
 	}
 
-	result, _ := utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
-	resultObj, _ := result.(utils.ResponseTx)
-	expected := "success"
-	if actual := resultObj.Result.DeliverTx.Log; actual != expected {
-		return fmt.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
-	}
-	return nil
+	_, err = utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
+
+	return err
 }
 
 func SetValidator(nodeID, privK string, param did.SetValidatorParam, keyType int) error {
@@ -151,12 +147,7 @@ func SetValidator(nodeID, privK string, param did.SetValidatorParam, keyType int
 		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
 	}
 
-	result, _ := utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
-	resultObj, _ := result.(utils.ResponseTx)
-	expected := "success"
-	if actual := resultObj.Result.DeliverTx.Log; actual != expected {
-		return fmt.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
-	}
+	_, err = utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
 
-	return nil
+	return err
 }

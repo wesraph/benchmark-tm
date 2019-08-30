@@ -20,9 +20,9 @@ import (
 	"strings"
 	"time"
 
-	protoTm "github.com/wesraph/benchmark-tm/protos/tendermint"
 	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/libs/common"
+	protoTm "github.com/wesraph/benchmark-tm/protos/tendermint"
 )
 
 var tendermintAddr = GetEnv("TENDERMINT_ADDRESS", "http://localhost:45000")
@@ -124,7 +124,7 @@ func CreateTxn(fnName []byte, param []byte, nonce []byte, signature []byte, node
 	if err != nil {
 		panic("boom")
 	}
-	URL.Path += "/broadcast_tx_commit"
+	URL.Path += "/broadcast_tx_sync"
 	parameters := url.Values{}
 	parameters.Add("tx", `0x`+txEncoded)
 	URL.RawQuery = parameters.Encode()
