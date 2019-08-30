@@ -26,9 +26,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/blockfint/benchmark-tm/abci/code"
-	"github.com/blockfint/benchmark-tm/abci/utils"
-	"github.com/blockfint/benchmark-tm/protos/data"
+	"github.com/wesraph/benchmark-tm/abci/code"
+	"github.com/wesraph/benchmark-tm/abci/utils"
+	"github.com/wesraph/benchmark-tm/protos/data"
 	"github.com/tendermint/tendermint/abci/types"
 )
 

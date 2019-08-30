@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"os"
 
-	didV1 "github.com/blockfint/benchmark-tm/abci/did/v1"
-	// didV2 "github.com/blockfint/benchmark-tm/abci/did2/v2"
+	didV1 "github.com/wesraph/benchmark-tm/abci/did/v1"
+	// didV2 "github.com/wesraph/benchmark-tm/abci/did2/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"

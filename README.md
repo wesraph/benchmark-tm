@@ -3,7 +3,7 @@
 1.  Clone the project to GOPATH
 
     ```sh
-    git clone https://github.com/blockfint/benchmark-tm
+    git clone https://github.com/wesraph/benchmark-tm
     ```
 
 2.  Install dependency

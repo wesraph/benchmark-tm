@@ -28,8 +28,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/blockfint/benchmark-tm/abci/did/v1"
-	"github.com/blockfint/benchmark-tm/test/utils"
+	"github.com/wesraph/benchmark-tm/abci/did/v1"
+	"github.com/wesraph/benchmark-tm/test/utils"
 	"github.com/kr/pretty"
 )
 

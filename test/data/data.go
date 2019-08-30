@@ -23,7 +23,7 @@
 package data
 
 import (
-	"github.com/blockfint/benchmark-tm/test/utils"
+	"github.com/wesraph/benchmark-tm/test/utils"
 	uuid "github.com/satori/go.uuid"
 )
 

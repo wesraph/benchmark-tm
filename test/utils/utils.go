@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	protoTm "github.com/blockfint/benchmark-tm/protos/tendermint"
+	protoTm "github.com/wesraph/benchmark-tm/protos/tendermint"
 	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/libs/common"
 )

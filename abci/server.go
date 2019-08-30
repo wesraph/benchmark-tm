@@ -42,7 +42,7 @@ import (
 
 	"github.com/tendermint/tendermint/abci/types"
 
-	"github.com/blockfint/benchmark-tm/abci/did"
+	"github.com/wesraph/benchmark-tm/abci/did"
 )
 
 type loggerWriter struct{}

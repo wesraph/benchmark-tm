@@ -30,23 +30,23 @@ RUN wget -qO /usr/local/bin/dep https://github.com/golang/dep/releases/download/
     echo "${DEP_SHA256SUM}  /usr/local/bin/dep" | sha256sum -c && \
     chmod +x /usr/local/bin/dep
 
-COPY Gopkg.toml Gopkg.lock $GOPATH/src/github.com/blockfint/benchmark-tm/
-WORKDIR $GOPATH/src/github.com/blockfint/benchmark-tm
+COPY Gopkg.toml Gopkg.lock $GOPATH/src/github.com/wesraph/benchmark-tm/
+WORKDIR $GOPATH/src/github.com/wesraph/benchmark-tm
 RUN dep ensure -vendor-only -v
 
-COPY abci $GOPATH/src/github.com/blockfint/benchmark-tm/abci
-COPY protos $GOPATH/src/github.com/blockfint/benchmark-tm/protos
-COPY .git $GOPATH/src/github.com/blockfint/benchmark-tm/.git
-COPY patches $GOPATH/src/github.com/blockfint/benchmark-tm/patches
+COPY abci $GOPATH/src/github.com/wesraph/benchmark-tm/abci
+COPY protos $GOPATH/src/github.com/wesraph/benchmark-tm/protos
+COPY .git $GOPATH/src/github.com/wesraph/benchmark-tm/.git
+COPY patches $GOPATH/src/github.com/wesraph/benchmark-tm/patches
 
-RUN git apply $GOPATH/src/github.com/blockfint/benchmark-tm/patches/tm_goleveldb_bloom_filter.patch && \
-    git apply $GOPATH/src/github.com/blockfint/benchmark-tm/patches/tm_cleveldb_cache_and_bloom_filter.patch
+RUN git apply $GOPATH/src/github.com/wesraph/benchmark-tm/patches/tm_goleveldb_bloom_filter.patch && \
+    git apply $GOPATH/src/github.com/wesraph/benchmark-tm/patches/tm_cleveldb_cache_and_bloom_filter.patch
 
-WORKDIR $GOPATH/src/github.com/blockfint/benchmark-tm/abci
+WORKDIR $GOPATH/src/github.com/wesraph/benchmark-tm/abci
 ENV CGO_ENABLED=1
 ENV CGO_LDFLAGS="-lsnappy"
 RUN go install \
-    -ldflags "-X github.com/blockfint/benchmark-tm/abci/version.GitCommit=`git rev-parse --short=8 HEAD`" \
+    -ldflags "-X github.com/wesraph/benchmark-tm/abci/version.GitCommit=`git rev-parse --short=8 HEAD`" \
     -tags "cleveldb"
 
 

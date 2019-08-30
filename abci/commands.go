@@ -27,7 +27,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/blockfint/benchmark-tm/abci/version"
+	"github.com/wesraph/benchmark-tm/abci/version"
 )
 
 var abciVersionCmd = &cobra.Command{
