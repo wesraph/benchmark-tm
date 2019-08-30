@@ -9,9 +9,9 @@ killgroup(){
 
 # Combine TM
 rm -rf DB*
-rm -rf tendermint_* 
-rm -rf abci_* 
-rm -rf log* 
+rm -rf tendermint_*
+rm -rf abci_*
+rm -rf log*
 rm -rf ABCI_*
 rm -rf event_log*
 

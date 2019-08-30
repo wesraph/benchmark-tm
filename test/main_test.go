@@ -35,7 +35,11 @@ func TestRegisterMasterNodeEcdsa(t *testing.T) {
 	param.MasterPublicKey = string(pemEncodedPub)
 	param.NodeName = ""
 
-	common.RegisterMasterNode(t, data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey)
+	err = common.RegisterMasterNode(data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("PASS")
 }
 
 func TestSetTxEcdsa(t *testing.T) {
@@ -44,7 +48,11 @@ func TestSetTxEcdsa(t *testing.T) {
 	param.To = `efc19d99-df9f-4dc4-a4bc-b54496ac878d-AAAA`
 	param.Price = 100.0
 	param.Amount = 0.00000001
-	common.SetTx(t, data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey)
+	err := common.SetTx(data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("PASS")
 }
 
 //func TestRegisterMasterNode(t *testing.T) {

@@ -27,7 +27,6 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
-	"testing"
 
 	"github.com/blockfint/benchmark-tm/abci/did/v1"
 	"github.com/blockfint/benchmark-tm/test/utils"
@@ -40,7 +39,7 @@ const (
 	RSAPrivateKey
 )
 
-func RegisterMasterNode(t *testing.T, nodeID, privK string, param did.RegisterMasterNodeParam, keyType int) {
+func RegisterMasterNode(nodeID, privK string, param did.RegisterMasterNodeParam, keyType int) error {
 	var privKeyEcdsa *ecdsa.PrivateKey
 	var privKeyRSA *rsa.PrivateKey
 	var err error
@@ -79,13 +78,13 @@ func RegisterMasterNode(t *testing.T, nodeID, privK string, param did.RegisterMa
 	expected := "success"
 	pretty.Println(resultObj)
 	if actual := resultObj.Result.DeliverTx.Log; actual != expected {
-		t.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
-		t.Fatalf("FAIL: %s\nExpected: %#v\nActual: %#v", fnName, expected, actual)
+		return fmt.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
 	}
-	t.Logf("PASS: %s", fnName)
+
+	return nil
 }
 
-func SetTx(t *testing.T, nodeID, privK string, param did.SetTxParam, keyType int) {
+func SetTx(nodeID, privK string, param did.SetTxParam, keyType int) error {
 	var privKeyEcdsa *ecdsa.PrivateKey
 	var privKeyRSA *rsa.PrivateKey
 	var err error
@@ -118,13 +117,12 @@ func SetTx(t *testing.T, nodeID, privK string, param did.SetTxParam, keyType int
 	resultObj, _ := result.(utils.ResponseTx)
 	expected := "success"
 	if actual := resultObj.Result.DeliverTx.Log; actual != expected {
-		t.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
-		t.Fatalf("FAIL: %s\nExpected: %#v\nActual: %#v", fnName, expected, actual)
+		return fmt.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
 	}
-	t.Logf("PASS: %s", fnName)
+	return nil
 }
 
-func SetValidator(t *testing.T, nodeID, privK string, param did.SetValidatorParam, keyType int) {
+func SetValidator(nodeID, privK string, param did.SetValidatorParam, keyType int) error {
 	var privKeyEcdsa *ecdsa.PrivateKey
 	var privKeyRSA *rsa.PrivateKey
 	var err error
@@ -157,8 +155,8 @@ func SetValidator(t *testing.T, nodeID, privK string, param did.SetValidatorPara
 	resultObj, _ := result.(utils.ResponseTx)
 	expected := "success"
 	if actual := resultObj.Result.DeliverTx.Log; actual != expected {
-		t.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
-		t.Fatalf("FAIL: %s\nExpected: %#v\nActual: %#v", fnName, expected, actual)
+		return fmt.Errorf("\n"+`CheckTx log: "%s"`, resultObj.Result.CheckTx.Log)
 	}
-	t.Logf("PASS: %s", fnName)
+
+	return nil
 }
