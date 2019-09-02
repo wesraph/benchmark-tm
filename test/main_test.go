@@ -67,15 +67,13 @@ func TestSetTxEcdsaWebSocket(t *testing.T) {
 	param.To = `efc19d99-df9f-4dc4-a4bc-b54496ac878d-AAAA`
 	param.Price = 100.0
 	param.Amount = 0.00000001
-	for {
-		err = common.SetTxWebSocket(data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey, ws)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		time.Sleep(time.Second)
-		t.Logf("PASS")
+	err = common.SetTxWebSocket(data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey, ws)
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	time.Sleep(time.Second)
+	t.Logf("PASS")
 }
 
 //func TestRegisterMasterNode(t *testing.T) {
