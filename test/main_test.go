@@ -5,6 +5,7 @@ import (
 	"encoding/pem"
 	"testing"
 
+	client "github.com/tendermint/tendermint/rpc/client"
 	"github.com/wesraph/benchmark-tm/abci/did/v1"
 	"github.com/wesraph/benchmark-tm/test/common"
 	"github.com/wesraph/benchmark-tm/test/data"
@@ -36,16 +37,40 @@ func TestRegisterMasterNodeEcdsa(t *testing.T) {
 	t.Logf("PASS")
 }
 
-func TestSetTxEcdsa(t *testing.T) {
+//func TestSetTxEcdsa(t *testing.T) {
+//var param did.SetTxParam
+//param.From = `6abface6-ad51-4ec6-bcf6-17e6042f7eee-AAAA`
+//param.To = `efc19d99-df9f-4dc4-a4bc-b54496ac878d-AAAA`
+//param.Price = 100.0
+//param.Amount = 0.00000001
+//err := common.SetTx(data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey)
+//if err != nil {
+//t.Fatal(err)
+//}
+//t.Logf("PASS")
+//}
+
+func TestSetTxEcdsaWebSocket(t *testing.T) {
+	ws := client.NewHTTP("localhost:45000", "/websocket")
+	if ws == nil {
+		panic("Websocket is null")
+	}
+
+	err := ws.OnStart()
+	if err != nil {
+		panic(err)
+	}
+
 	var param did.SetTxParam
 	param.From = `6abface6-ad51-4ec6-bcf6-17e6042f7eee-AAAA`
 	param.To = `efc19d99-df9f-4dc4-a4bc-b54496ac878d-AAAA`
 	param.Price = 100.0
 	param.Amount = 0.00000001
-	err := common.SetTx(data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey)
+	err = common.SetTxWebSocket(data.MasterNodeID, data.MasterNodePrivEcdsa, param, common.EcdsaPrivateKey, ws)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	t.Logf("PASS")
 }
 
@@ -63,7 +88,7 @@ func TestSetTxEcdsa(t *testing.T) {
 //param.PublicKey = string(publicKeyBytes)
 //param.MasterPublicKey = string(publicKeyBytes)
 //param.NodeName = ""
-//common.RegisterMasterNode(t, data.MasterNodeID, data.MasterNodePrivRSA, param, common.RSAPrivateKey)
+//common.RegisterMasterNode(data.MasterNodeID, data.MasterNodePrivRSA, param, common.RSAPrivateKey)
 //}
 
 //func TestSetTx(t *testing.T) {
@@ -72,7 +97,7 @@ func TestSetTxEcdsa(t *testing.T) {
 //param.To = `efc19d99-df9f-4dc4-a4bc-b54496ac878d-AAAA`
 //param.Price = 100.0
 //param.Amount = 0.00000001
-//common.SetTx(t, data.MasterNodeID, data.MasterNodePrivRSA, param, common.RSAPrivateKey)
+//common.SetTx(data.MasterNodeID, data.MasterNodePrivRSA, param, common.RSAPrivateKey)
 //}
 
 //func TestSetValidator(t *testing.T) {

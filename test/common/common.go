@@ -28,6 +28,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	client "github.com/tendermint/tendermint/rpc/client"
 	"github.com/wesraph/benchmark-tm/abci/did/v1"
 	"github.com/wesraph/benchmark-tm/test/utils"
 )
@@ -39,6 +40,7 @@ const (
 )
 
 func RegisterMasterNode(nodeID, privK string, param did.RegisterMasterNodeParam, keyType int) error {
+	fmt.Println("test")
 	var privKeyEcdsa *ecdsa.PrivateKey
 	var privKeyRSA *rsa.PrivateKey
 	var err error
@@ -62,6 +64,7 @@ func RegisterMasterNode(nodeID, privK string, param did.RegisterMasterNodeParam,
 	var nonce string
 	var signature []byte
 
+	fmt.Println("Creating signature")
 	if keyType == EcdsaPrivateKey {
 		nonce, signature = utils.CreateSignatureAndNonceEcdsa(fnName, paramJSON, privKeyEcdsa)
 	} else if keyType == RSAPrivateKey {
@@ -114,6 +117,40 @@ func SetTx(nodeID, privK string, param did.SetTxParam, keyType int) error {
 	}
 
 	_, err = utils.CreateTxn([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID))
+
+	return err
+}
+
+func SetTxWebSocket(nodeID, privK string, param did.SetTxParam, keyType int, ws *client.HTTP) error {
+	var privKeyEcdsa *ecdsa.PrivateKey
+	var privKeyRSA *rsa.PrivateKey
+	var err error
+
+	if keyType == EcdsaPrivateKey {
+		privKeyEcdsa, err = utils.GetPrivateKeyFromStringEcdsa(privK)
+	} else if keyType == RSAPrivateKey {
+		privKeyRSA, err = utils.GetPrivateKeyFromString(privK)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	paramJSON, err := json.Marshal(param)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fnName := "SetTx"
+
+	var nonce string
+	var signature []byte
+	if keyType == EcdsaPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonceEcdsa(fnName, paramJSON, privKeyEcdsa)
+	} else if keyType == RSAPrivateKey {
+		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
+	}
+
+	_, err = utils.CreateTxnWebSocket([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID), ws)
 
 	return err
 }

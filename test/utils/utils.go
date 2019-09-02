@@ -22,10 +22,11 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/libs/common"
+	client "github.com/tendermint/tendermint/rpc/client"
 	protoTm "github.com/wesraph/benchmark-tm/protos/tendermint"
 )
 
-var tendermintAddr = GetEnv("TENDERMINT_ADDRESS", "http://localhost:45000")
+var TendermintAddr = GetEnv("TENDERMINT_ADDRESS", "http://localhost:45000")
 
 func GetPrivateKeyFromStringEcdsa(privK string) (*ecdsa.PrivateKey, error) {
 	block, _ := pem.Decode([]byte(privK))
@@ -119,16 +120,19 @@ func CreateTxn(fnName []byte, param []byte, nonce []byte, signature []byte, node
 		log.Printf("err: %s", err.Error())
 	}
 	txEncoded := hex.EncodeToString(txByte)
+
 	var URL *url.URL
-	URL, err = url.Parse(tendermintAddr)
+	URL, err = url.Parse(TendermintAddr)
 	if err != nil {
-		panic("boom")
+		panic(err)
 	}
 	URL.Path += "/broadcast_tx_sync"
+
 	parameters := url.Values{}
 	parameters.Add("tx", `0x`+txEncoded)
 	URL.RawQuery = parameters.Encode()
 	encodedURL := URL.String()
+
 	req, err := http.NewRequest("GET", encodedURL, nil)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -140,14 +144,32 @@ func CreateTxn(fnName []byte, param []byte, nonce []byte, signature []byte, node
 			return http.ErrUseLastResponse
 		},
 	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
 	var body ResponseTx
 	json.NewDecoder(resp.Body).Decode(&body)
 	return body, nil
+}
+
+func CreateTxnWebSocket(fnName []byte, param []byte, nonce []byte, signature []byte, nodeID []byte, ws *client.HTTP) (interface{}, error) {
+	var tx protoTm.Tx
+	tx.Method = string(fnName)
+	tx.Params = string(param)
+	tx.Nonce = nonce
+	tx.Signature = signature
+	tx.NodeId = string(nodeID)
+	txByte, err := proto.Marshal(&tx)
+	if err != nil {
+		log.Printf("err: %s", err.Error())
+	}
+	//txEncoded := hex.EncodeToString(txByte)
+
+	return ws.BroadcastTxSync(txByte)
 }
 
 func Query(fnName []byte, param []byte) (interface{}, error) {
@@ -160,7 +182,7 @@ func Query(fnName []byte, param []byte) (interface{}, error) {
 	}
 	dataEncoded := hex.EncodeToString(dataByte)
 	var URL *url.URL
-	URL, err = url.Parse(tendermintAddr)
+	URL, err = url.Parse(TendermintAddr)
 	if err != nil {
 		panic("boom")
 	}
