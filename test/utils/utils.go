@@ -158,7 +158,6 @@ func CreateTxn(fnName []byte, param []byte, nonce []byte, signature []byte, node
 }
 
 func CreateTxnWebSocket(fnName []byte, param []byte, nonce []byte, signature []byte, nodeID []byte, ws *client.HTTP) (*ctypes.ResultBroadcastTx, error) {
-	time.Sleep(time.Second * time.Duration(2))
 	var tx protoTm.Tx
 	tx.Method = string(fnName)
 	tx.Params = string(param)
