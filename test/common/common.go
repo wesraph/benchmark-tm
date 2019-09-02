@@ -150,7 +150,11 @@ func SetTxWebSocket(nodeID, privK string, param did.SetTxParam, keyType int, ws 
 		nonce, signature = utils.CreateSignatureAndNonce(fnName, paramJSON, privKeyRSA)
 	}
 
-	_, err = utils.CreateTxnWebSocket([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID), ws)
+	res, err := utils.CreateTxnWebSocket([]byte(fnName), paramJSON, []byte(nonce), signature, []byte(nodeID), ws)
+
+	if res.Code != 0x0 {
+		return fmt.Errorf(res.Log)
+	}
 
 	return err
 }

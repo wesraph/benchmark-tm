@@ -23,6 +23,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/libs/common"
 	client "github.com/tendermint/tendermint/rpc/client"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	protoTm "github.com/wesraph/benchmark-tm/protos/tendermint"
 )
 
@@ -156,7 +157,8 @@ func CreateTxn(fnName []byte, param []byte, nonce []byte, signature []byte, node
 	return body, nil
 }
 
-func CreateTxnWebSocket(fnName []byte, param []byte, nonce []byte, signature []byte, nodeID []byte, ws *client.HTTP) (interface{}, error) {
+func CreateTxnWebSocket(fnName []byte, param []byte, nonce []byte, signature []byte, nodeID []byte, ws *client.HTTP) (*ctypes.ResultBroadcastTx, error) {
+	time.Sleep(time.Second * time.Duration(2))
 	var tx protoTm.Tx
 	tx.Method = string(fnName)
 	tx.Params = string(param)
