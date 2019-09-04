@@ -31,6 +31,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"encoding/asn1"
 	"fmt"
 	"math/big"
 	"strings"
