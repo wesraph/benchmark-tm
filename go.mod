@@ -1,0 +1,55 @@
+module github.com/wesraph/benchmark-tm
+
+go 1.12
+
+require (
+	github.com/beorn7/perks v1.0.1
+	github.com/btcsuite/btcd v0.0.0-20190824003749-130ea5bddde3
+	github.com/davecgh/go-spew v1.1.1
+	github.com/etcd-io/bbolt v1.3.3
+	github.com/fatih/structs v1.1.0
+	github.com/fsnotify/fsnotify v1.4.7
+	github.com/go-kit/kit v0.8.0
+	github.com/go-logfmt/logfmt v0.4.0
+	github.com/go-stack/stack v1.8.0
+	github.com/gogo/protobuf v1.2.1
+	github.com/golang/protobuf v1.3.2
+	github.com/golang/snappy v0.0.1
+	github.com/gorilla/websocket v1.4.1
+	github.com/hashicorp/hcl v1.0.0
+	github.com/inconshreveable/mousetrap v1.0.0
+	github.com/jmhodges/levigo v1.0.0
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2
+	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
+	github.com/kr/pretty v0.1.0
+	github.com/magiconair/properties v1.8.1
+	github.com/matttproud/golang_protobuf_extensions v1.0.1
+	github.com/mitchellh/mapstructure v1.1.2
+	github.com/pelletier/go-toml v1.4.0
+	github.com/pkg/errors v0.8.1
+	github.com/prometheus/client_golang v1.0.0
+	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
+	github.com/prometheus/common v0.6.0
+	github.com/prometheus/procfs v0.0.4
+	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563
+	github.com/rs/cors v1.7.0
+	github.com/satori/go.uuid v1.2.0
+	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/afero v1.2.2
+	github.com/spf13/cast v1.3.0
+	github.com/spf13/cobra v0.0.5
+	github.com/spf13/jwalterweatherman v1.1.0
+	github.com/spf13/pflag v1.0.3
+	github.com/spf13/viper v1.4.0
+	github.com/syndtr/goleveldb v0.0.0-20190318030020-c3a204f8e965
+	github.com/tendermint/go-amino v0.14.1
+	github.com/tendermint/tendermint v0.31.7
+	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
+	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
+	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
+	golang.org/x/text v0.3.2
+	google.golang.org/appengine v1.4.0 // indirect
+	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
+	google.golang.org/grpc v1.23.0
+	gopkg.in/yaml.v2 v2.2.2
+)
