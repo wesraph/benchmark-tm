@@ -112,18 +112,11 @@ func verifySignature(param string, nonce []byte, signature []byte, publicKey str
 
 	switch pubKey := senderPublicKeyInterface.(type) {
 	case *ecdsa.PublicKey:
-		// Get R and S
-		// type SignValues struct {
-		// 	R BigInt
-		// 	S BigInt
-		// }
 		var signVal SignValues
-		// err = json.Unmarshal(signature, &signVal)
 		_, err = asn1.Unmarshal(signature, &signVal)
 		if err != nil {
 			return false, nil
 		}
-		// r, s := big.Int(signVal.R.Int), big.Int(signVal.S.Int)
 
 		return ecdsa.Verify(pubKey, hashed, signVal.R, signVal.S), nil
 	case *rsa.PublicKey:
