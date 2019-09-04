@@ -31,6 +31,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"encoding/asn1"
 	"fmt"
 	"math/big"
 	"strings"
@@ -47,25 +48,8 @@ var IsMethod = map[string]bool{
 	"SetValidator":       true,
 }
 
-type BigInt struct {
-	big.Int
-}
-
-func (b BigInt) MarshalJSON() ([]byte, error) {
-	return []byte(b.String()), nil
-}
-
-func (b *BigInt) UnmarshalJSON(p []byte) error {
-	if string(p) == "null" {
-		return nil
-	}
-	var z big.Int
-	_, ok := z.SetString(string(p), 10)
-	if !ok {
-		return fmt.Errorf("not a valid big integer: %s", p)
-	}
-	b.Int = z
-	return nil
+type SignValues struct {
+	R, S *big.Int
 }
 
 func (app *DIDApplication) checkCanRegisterMasterNode(param string, nodeID string) types.ResponseCheckTx {
@@ -107,19 +91,13 @@ func verifySignature(param string, nonce []byte, signature []byte, publicKey str
 
 	switch pubKey := senderPublicKeyInterface.(type) {
 	case *ecdsa.PublicKey:
-		// Get R and S
-		type SignValues struct {
-			R BigInt
-			S BigInt
-		}
 		var signVal SignValues
-		err = json.Unmarshal(signature, &signVal)
+		_, err = asn1.Unmarshal(signature, &signVal)
 		if err != nil {
 			return false, nil
 		}
-		r, s := big.Int(signVal.R.Int), big.Int(signVal.S.Int)
 
-		return ecdsa.Verify(pubKey, hashed, &r, &s), nil
+		return ecdsa.Verify(pubKey, hashed, signVal.R, signVal.S), nil
 	case *rsa.PublicKey:
 		err = rsa.VerifyPKCS1v15(pubKey, newhash, hashed, signature)
 		return err == nil, err
