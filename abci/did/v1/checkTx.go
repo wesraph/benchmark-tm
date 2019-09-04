@@ -51,6 +51,10 @@ type BigInt struct {
 	big.Int
 }
 
+type SignValues struct {
+	R, S *big.Int
+}
+
 func (b BigInt) MarshalJSON() ([]byte, error) {
 	return []byte(b.String()), nil
 }
@@ -108,18 +112,19 @@ func verifySignature(param string, nonce []byte, signature []byte, publicKey str
 	switch pubKey := senderPublicKeyInterface.(type) {
 	case *ecdsa.PublicKey:
 		// Get R and S
-		type SignValues struct {
-			R BigInt
-			S BigInt
-		}
+		// type SignValues struct {
+		// 	R BigInt
+		// 	S BigInt
+		// }
 		var signVal SignValues
-		err = json.Unmarshal(signature, &signVal)
+		// err = json.Unmarshal(signature, &signVal)
+		_, err = asn1.Unmarshal(signature, &signVal)
 		if err != nil {
 			return false, nil
 		}
-		r, s := big.Int(signVal.R.Int), big.Int(signVal.S.Int)
+		// r, s := big.Int(signVal.R.Int), big.Int(signVal.S.Int)
 
-		return ecdsa.Verify(pubKey, hashed, &r, &s), nil
+		return ecdsa.Verify(pubKey, hashed, signVal.R, signVal.S), nil
 	case *rsa.PublicKey:
 		err = rsa.VerifyPKCS1v15(pubKey, newhash, hashed, signature)
 		return err == nil, err
